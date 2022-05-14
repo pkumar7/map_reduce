@@ -168,10 +168,6 @@ func CallUpdateReduceTaskCompletion(reduce_file_name string) {
 	// declare a reply structure.
 	reply := ExampleReply{}
 
-	// send the RPC request, wait for the reply.
-	// the "Coordinator.Example" tells the
-	// receiving server that we'd like to call
-	// the Example() method of struct Coordinator.
 	ok := call("Coordinator.CallUpdateReduceTaskCompletion", &args, &reply)
 	if ok {
 		// reply.Y should be 100.
@@ -192,10 +188,6 @@ func CallUpdateMapTaskCompletion(filenames []string, map_file_name string) {
 	// declare a reply structure.
 	reply := ExampleReply{}
 
-	// send the RPC request, wait for the reply.
-	// the "Coordinator.Example" tells the
-	// receiving server that we'd like to call
-	// the Example() method of struct Coordinator.
 	ok := call("Coordinator.CallUpdateMapTaskCompletion", &args, &reply)
 	if ok {
 		// reply.Y should be 100.
@@ -221,10 +213,6 @@ func CallReturnTask(task_type string) (string, int) {
 	// declare a reply structure.
 	reply := ExampleReply{}
 
-	// send the RPC request, wait for the reply.
-	// the "Coordinator.ReturnTask" tells the
-	// receiving server that we'd like to call
-	// the Example() method of struct Coordinator.
 	ok := call("Coordinator.ReturnTask", &args, &reply)
 	if ok {
 		return reply.Filename, reply.TaskNumber
