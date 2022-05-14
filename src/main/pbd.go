@@ -4,10 +4,12 @@ package main
 // see directions in pbc.go
 //
 
-import "time"
-import "6.824/pbservice"
-import "os"
-import "fmt"
+import (
+	"fmt"
+	"map_reduce/pbservice"
+	"os"
+	"time"
+)
 
 func main() {
 	if len(os.Args) != 3 {

@@ -1,15 +1,21 @@
 package mr
 
-import "log"
-import "net"
-import "os"
-import "net/rpc"
-import "net/http"
+import (
+	"log"
+	"net"
+	"net/http"
+	"net/rpc"
+	"os"
+	"sync"
+)
 
+type Task map[string]interface{}
 
 type Coordinator struct {
 	// Your definitions here.
-
+	map_tasks    []Task
+	reduce_tasks []Task
+	Lock         *sync.RWMutex
 }
 
 // Your code here -- RPC handlers for the worker to call.
@@ -24,6 +30,64 @@ func (c *Coordinator) Example(args *ExampleArgs, reply *ExampleReply) error {
 	return nil
 }
 
+func (c *Coordinator) ReturnTask(args *ExampleArgs, reply *ExampleReply) error {
+	if args.Task_Type == "map_task" {
+		for _, task := range c.map_tasks {
+			if task["is_processed"] == true {
+				continue
+			}
+			c.Lock.Lock()
+			task["is_processed"] = true
+			c.Lock.Unlock()
+			reply.Filename = task["filename"].(string)
+			reply.TaskNumber = task["task_number"].(int)
+			return nil
+		}
+	}
+	if args.Task_Type == "reduce_task" {
+		log.Printf("these are reduce tasks", c.reduce_tasks)
+		for _, task := range c.reduce_tasks {
+			if task["is_processed"] == true {
+				continue
+			}
+			c.Lock.Lock()
+			task["is_processed"] = true
+			c.Lock.Unlock()
+			reply.Filename = task["filename"].(string)
+			return nil
+		}
+	}
+	// if c.map_tasks_finished && c.reduce_tasks_finished {
+	// 	c.mark_task_complete()
+	// }
+	return nil
+}
+
+func (c *Coordinator) CallUpdateReduceTaskCompletion(args *ExampleArgs, reply *ExampleReply) error {
+	c.Lock.Lock()
+	for _, task := range c.reduce_tasks {
+		if args.Reduce_file_name == task["filename"] {
+			task["is_completed"] = true
+		}
+	}
+	c.Lock.Unlock()
+	return nil
+}
+
+func (c *Coordinator) CallUpdateMapTaskCompletion(args *ExampleArgs, reply *ExampleReply) error {
+	c.Lock.Lock()
+	for _, file_name := range args.Intermedeate_file_names {
+		task_details := Task{"filename": file_name, "is_processed": false, "is_completed": false}
+		c.reduce_tasks = append(c.reduce_tasks, task_details)
+	}
+	for _, task := range c.map_tasks {
+		if args.Map_file_name == task["filename"] {
+			task["is_completed"] = true
+		}
+	}
+	c.Lock.Unlock()
+	return nil
+}
 
 //
 // start a thread that listens for RPCs from worker.go
@@ -46,12 +110,19 @@ func (c *Coordinator) server() {
 // if the entire job has finished.
 //
 func (c *Coordinator) Done() bool {
-	ret := false
-
-	// Your code here.
-
-
-	return ret
+	c.Lock.Lock()
+	defer c.Lock.Unlock()
+	for _, task := range c.map_tasks {
+		if task["is_completed"] == false {
+			return false
+		}
+	}
+	for _, task := range c.reduce_tasks {
+		if task["is_completed"] == false {
+			return false
+		}
+	}
+	return true
 }
 
 //
@@ -61,10 +132,12 @@ func (c *Coordinator) Done() bool {
 //
 func MakeCoordinator(files []string, nReduce int) *Coordinator {
 	c := Coordinator{}
-
-	// Your code here.
-
-
+	for index, filename := range files {
+		task_details := Task{"filename": filename, "is_processed": false,
+			"is_completed": false, "task_number": index}
+		c.map_tasks = append(c.map_tasks, task_details)
+	}
+	c.Lock = &sync.RWMutex{}
 	c.server()
 	return &c
 }
