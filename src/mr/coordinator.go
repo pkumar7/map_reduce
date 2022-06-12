@@ -30,7 +30,7 @@ func (c *Coordinator) Example(args *ExampleArgs, reply *ExampleReply) error {
 	return nil
 }
 
-func (c *Coordinator) ReturnTask(args *ExampleArgs, reply *ExampleReply) error {
+func (c *Coordinator) ReturnTask(args *TaskRequestArgs, reply *TaskReplyArgs) error {
 	if args.Task_Type == "map_task" {
 		for _, task := range c.map_tasks {
 			if task["is_processed"] == true {
@@ -45,7 +45,6 @@ func (c *Coordinator) ReturnTask(args *ExampleArgs, reply *ExampleReply) error {
 		}
 	}
 	if args.Task_Type == "reduce_task" {
-		log.Printf("these are reduce tasks", c.reduce_tasks)
 		for _, task := range c.reduce_tasks {
 			if task["is_processed"] == true {
 				continue
@@ -57,13 +56,10 @@ func (c *Coordinator) ReturnTask(args *ExampleArgs, reply *ExampleReply) error {
 			return nil
 		}
 	}
-	// if c.map_tasks_finished && c.reduce_tasks_finished {
-	// 	c.mark_task_complete()
-	// }
 	return nil
 }
 
-func (c *Coordinator) CallUpdateReduceTaskCompletion(args *ExampleArgs, reply *ExampleReply) error {
+func (c *Coordinator) CallUpdateReduceTaskCompletion(args *TaskRequestArgs, reply *TaskReplyArgs) error {
 	c.Lock.Lock()
 	for _, task := range c.reduce_tasks {
 		if args.Reduce_file_name == task["filename"] {
@@ -74,7 +70,7 @@ func (c *Coordinator) CallUpdateReduceTaskCompletion(args *ExampleArgs, reply *E
 	return nil
 }
 
-func (c *Coordinator) CallUpdateMapTaskCompletion(args *ExampleArgs, reply *ExampleReply) error {
+func (c *Coordinator) CallUpdateMapTaskCompletion(args *TaskRequestArgs, reply *TaskReplyArgs) error {
 	c.Lock.Lock()
 	for _, file_name := range args.Intermedeate_file_names {
 		task_details := Task{"filename": file_name, "is_processed": false, "is_completed": false}

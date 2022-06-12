@@ -17,11 +17,14 @@ import (
 //
 
 type ExampleArgs struct {
-	X                       int
-	Task_Type               string
-	Intermedeate_file_names []string
+	X int
+}
+
+type TaskRequestArgs struct {
 	Map_file_name           string
 	Reduce_file_name        string
+	Task_Type               string
+	Intermedeate_file_names []string
 }
 
 type TaskStatusArgs struct {
@@ -29,7 +32,10 @@ type TaskStatusArgs struct {
 }
 
 type ExampleReply struct {
-	Y          int
+	Y int
+}
+
+type TaskReplyArgs struct {
 	Filename   string
 	TaskNumber int
 }

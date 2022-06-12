@@ -156,7 +156,7 @@ func contains(s []string, e string) bool {
 func CallUpdateReduceTaskCompletion(reduce_file_name string) {
 
 	// declare an argument structure.
-	args := ExampleArgs{}
+	args := TaskRequestArgs{}
 
 	// fill in the argument(s).
 	args.Reduce_file_name = reduce_file_name
@@ -175,7 +175,7 @@ func CallUpdateReduceTaskCompletion(reduce_file_name string) {
 func CallUpdateMapTaskCompletion(filenames []string, map_file_name string) {
 
 	// declare an argument structure.
-	args := ExampleArgs{}
+	args := TaskRequestArgs{}
 
 	// fill in the argument(s).
 	args.Intermedeate_file_names = filenames
@@ -195,7 +195,7 @@ func CallUpdateMapTaskCompletion(filenames []string, map_file_name string) {
 func CallReturnTask(task_type string) (string, int) {
 
 	// declare an argument structure.
-	args := ExampleArgs{}
+	args := TaskRequestArgs{}
 
 	// fill in the argument(s).
 	if task_type == "map_task" {
@@ -207,7 +207,7 @@ func CallReturnTask(task_type string) (string, int) {
 	}
 
 	// declare a reply structure.
-	reply := ExampleReply{}
+	reply := TaskReplyArgs{}
 
 	ok := call("Coordinator.ReturnTask", &args, &reply)
 	if ok {
