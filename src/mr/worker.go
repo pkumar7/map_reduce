@@ -47,10 +47,6 @@ func Worker(mapf func(string, string) []KeyValue,
 			break
 		}
 	}
-
-	// Your worker implementation here.
-
-	// uncomment to send the Example RPC to the coordinator.
 }
 
 func execute_map_task(mapf func(string, string) []KeyValue) (is_complete bool) {
