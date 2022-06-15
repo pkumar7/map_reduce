@@ -31,3 +31,6 @@ Open another tab, move to main directory and run the Worker for word count appli
 ```
 go run -race mrworker.go wc.so
 ```
+
+
+References -  https://pdos.csail.mit.edu/6.824/papers/mapreduce.pdf
